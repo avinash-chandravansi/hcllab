@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HCLTech Cloud Security & Identity Interactive Activities</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+  <div id="app-container">
+
+    <!-- CORPORATE WHITE HEADER -->
+    <header>
+      <div class="logo-section">
+        <h1 class="hcl-logo">
+          <span class="hcl-blue">HCL</span><span class="hcl-tech">Tech</span>
+          <span class="logo-tag">Session Activity</span>
+        </h1>
+      </div>
+      <div class="hud-section">
+        <div class="score-hud-badge">
+          Progress: <span id="hud-score-tally">0 / 5</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- VIEW 1: MODULE & ACTIVITY DASHBOARD -->
+    <main id="hub-view">
+      <div class="hub-hero">
+        <h2>Cloud Security Presentation Activities</h2>
+        <p>Welcome to the HCLTech Cloud Security presentation companion. Select an activity below to explore interactive scenarios, drag-and-drop mappings, and system dashboards with the audience.</p>
+      </div>
+      <div class="modules-grid">
+        <!-- Dynamically rendered by app.js -->
+      </div>
+    </main>
+ 
+    <!-- VIEW 1.5: MODULE DETAIL VIEW (SEPARATE PAGE) -->
+    <main id="module-view" style="display: none;">
+      <div class="module-view-header">
+        <button id="btn-module-back" class="btn-quit">← Back to Modules</button>
+        <h2 id="module-view-title">Module Title</h2>
+        <button id="btn-module-reset" class="btn-reset">Reset Module Progress</button>
+      </div>
+      <div class="glass-panel module-desc-panel">
+        <p id="module-view-desc"></p>
+      </div>
+      <h3 class="game-slots-title">Session Activities</h3>
+      <div class="collapsible-games-list" id="module-games-list">
+        <!-- Dynamically rendered by app.js -->
+      </div>
+    </main>
+
+    <!-- VIEW 2: ACTIVE ACTIVITY WORKSPACE (50/50 Split) -->
+    <main id="game-view" style="display: none;">
+      
+      <!-- Left Panel: Dynamic Vector Diagram Panel -->
+      <section class="image-panel" id="diagram-panel-container">
+        <!-- Rendered dynamically by app.js -->
+      </section>
+
+      <!-- Right Panel: Interactive Activity Console -->
+      <section class="mission-control-panel">
+        
+        <div class="game-title-bar">
+          <h3 id="current-game-title">Activity Title</h3>
+          <button id="btn-quit" class="btn-quit">Exit Activity</button>
+        </div>
+
+        <!-- Progress ticks (shown for multi-step activities like scenarios and swiper) -->
+        <div id="progress-ticks" class="progress-container">
+          <!-- Populated by app.js -->
+        </div>
+
+        <!-- Dynamic Activity Workspace -->
+        <div id="activity-workspace">
+          <!-- Rendered dynamically by app.js based on activity type -->
+        </div>
+
+        <!-- Educational outcomes feedback -->
+        <div id="correct-feedback" class="feedback-box correct">
+          <div class="feedback-header">
+            <svg style="width:16px; height:16px; fill:var(--neon-green)" viewBox="0 0 24 24"><path d="M12,2A10,10 0 1,0 22,12A10,10 0 0,0 12,2M10,17L5,12L6.41,10.58L10,14.17L17.59,6.58L19,8L10,17Z"/></svg>
+            SECURE DESIGN CONFIGURATION
+          </div>
+          <p id="correct-explanation"></p>
+        </div>
+
+        <div id="incorrect-feedback" class="feedback-box incorrect">
+          <div class="feedback-header">
+            <svg style="width:16px; height:16px; fill:var(--neon-red)" viewBox="0 0 24 24"><path d="M13 14H11V9H13M13 18H11V16H13M1 21H23L12 2L1 21Z"/></svg>
+            POTENTIAL SECURITY RISK
+          </div>
+          <button id="btn-reveal-explanation" class="btn-reveal">Discuss Security Context</button>
+          
+          <div id="reveal-block" class="reveal-text">
+            <p id="reveal-cause-text"></p>
+          </div>
+        </div>
+
+        <!-- Action Control triggers -->
+        <div class="action-area">
+          <button id="btn-submit" class="btn-primary" disabled>
+            Confirm Choice
+          </button>
+          <button id="btn-next" class="btn-primary" style="display: none;">
+            Next Scenario
+          </button>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- VIEW 3: ACTIVITY COMPLETED RESULTS VIEW -->
+    <main id="results-view" style="display: none;">
+      <div class="results-panel glass-panel">
+        <div class="results-badge success">
+          <!-- Filled by app.js -->
+        </div>
+        <h2 class="results-title success">Activity Completed</h2>
+        <p class="results-subtitle">You have run through the interactive scenarios. Here is a summary of your selections.</p>
+
+        <!-- Final score distribution table -->
+        <div class="score-display">
+          <div class="score-col">
+            <span class="score-label">Checkpoints Reviewed</span>
+            <span id="final-score" class="score-value highlight">5 / 5</span>
+          </div>
+          <div class="score-col">
+            <span class="score-label">Activity Status</span>
+            <span id="final-percent" class="score-value highlight">100%</span>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 14px; width: 100%;">
+          <button id="btn-results-retry" class="btn-primary btn-secondary-style" style="flex: 1; padding: 12px; font-size: 0.9rem;">Restart Activity</button>
+          <button id="btn-results-quit" class="btn-primary" style="flex: 1; padding: 12px; font-size: 0.9rem;">Return to Activity Hub</button>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <!-- Include Javascript files -->
+  <script src="gameData.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
