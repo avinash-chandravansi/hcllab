@@ -54,6 +54,18 @@ class AppController {
 
     document.getElementById('btn-reveal-explanation').addEventListener('click', () => this.revealExplanation());
 
+    // Reset All Progress
+    const btnResetAll = document.getElementById('btn-reset-all');
+    if (btnResetAll) {
+      btnResetAll.addEventListener('click', () => {
+        if (confirm('Reset ALL progress across all modules?')) {
+          this.completedGames = {};
+          localStorage.setItem('completed_games', JSON.stringify(this.completedGames));
+          this.renderHub();
+        }
+      });
+    }
+
     // Module View Listeners
     document.getElementById('btn-module-back').addEventListener('click', () => {
       this.switchView('hub');
@@ -93,7 +105,7 @@ class AppController {
     this.currentView = viewName;
     this.hubView.style.display = viewName === 'hub' ? 'block' : 'none';
     this.moduleView.style.display = viewName === 'module' ? 'block' : 'none';
-    this.gameView.style.display = viewName === 'game' ? 'grid' : 'none';
+    this.gameView.style.display = (viewName === 'game' || viewName === 'results') ? 'grid' : 'none';
     this.resultsView.style.display = viewName === 'results' ? 'flex' : 'none';
 
     if (viewName === 'hub') {
@@ -370,22 +382,33 @@ class AppController {
       }
     });
 
+    const labels = ['A', 'B', 'C', 'D', 'E'];
+
     workspace.innerHTML = `
       <div class="scenario-workspace">
-        <div class="scenario-details">
-          <span class="module-badge">Scenario ${this.currentDecisionIndex + 1} of 5</span>
-          <div class="scenario-box">${decision.scenario}</div>
-          <h4 class="question-text">${decision.question}</h4>
+        <div class="scenario-header-row">
+          <span class="scenario-step-badge">Scenario ${this.currentDecisionIndex + 1} <span class="scenario-of-five">of 5</span></span>
         </div>
-        <div id="options-list" class="options-list"></div>
+        <div class="scenario-context-block">
+          <div class="scenario-context-label">SITUATION</div>
+          <div class="scenario-context-text">${decision.scenario}</div>
+        </div>
+        <div class="question-block">
+          <div class="question-icon">?</div>
+          <h4 class="question-text-new">${decision.question}</h4>
+        </div>
+        <div id="options-list" class="options-list-new"></div>
       </div>
     `;
 
     const optionsContainer = workspace.querySelector('#options-list');
     decision.options.forEach((opt, idx) => {
       const optBtn = document.createElement('button');
-      optBtn.className = 'option-btn';
-      optBtn.innerHTML = opt;
+      optBtn.className = 'option-btn-new';
+      optBtn.innerHTML = `
+        <span class="option-letter">${labels[idx]}</span>
+        <span class="option-text-content">${opt}</span>
+      `;
       optBtn.addEventListener('click', () => this.selectOption(idx));
       optionsContainer.appendChild(optBtn);
     });
@@ -396,12 +419,14 @@ class AppController {
 
     this.selectedOptionIndex = idx;
     
-    const options = document.querySelectorAll('#options-list .option-btn');
+    const options = document.querySelectorAll('#options-list .option-btn-new');
     options.forEach((btn, btnIdx) => {
       if (btnIdx === idx) {
         btn.classList.add('selected');
+        btn.querySelector('.option-letter').classList.add('selected-letter');
       } else {
         btn.classList.remove('selected');
+        btn.querySelector('.option-letter').classList.remove('selected-letter');
       }
     });
 
@@ -415,8 +440,9 @@ class AppController {
 
     workspace.innerHTML = `
       <div class="drag-drop-workspace">
-        <div class="scenario-box" style="margin-bottom:12px; font-size:0.95rem;">
-          <strong>Interactive Mappings</strong>: Sort the 6 security duties into their correct category column. Click a card to select it, then click a target column to drop it, or drag them directly.
+        <div class="drag-instruction-bar">
+          <span class="drag-instruction-icon">↔</span>
+          <span>Click a card to select it, then click a column — or drag it directly into place</span>
         </div>
         
         <div class="drag-deck" id="drag-card-deck"></div>
@@ -533,15 +559,22 @@ class AppController {
 
     workspace.innerHTML = `
       <div class="swiper-workspace">
-        <div class="scenario-box" style="margin-bottom:6px; font-size:0.95rem; width:100%; text-align:center;">
-          <strong>Card Sorting</strong>: Classify the auth event. Click <strong>Vulnerable</strong> or <strong>Secure</strong> below.
+        <div class="swiper-instructions">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+          Classify each authentication event as <strong>Secure</strong> or <strong>Vulnerable</strong>
         </div>
         
         <div class="card-deck-container" id="swiper-deck"></div>
 
         <div class="swiper-controls" id="swiper-btns">
-          <button class="btn-swipe-vulnerable" id="btn-vulnerable">Vulnerable</button>
-          <button class="btn-swipe-secure" id="btn-secure">Secure</button>
+          <button class="btn-swipe-vulnerable" id="btn-vulnerable">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle; margin-right:6px"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            Vulnerable
+          </button>
+          <button class="btn-swipe-secure" id="btn-secure">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle; margin-right:6px"><path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z"/></svg>
+            Secure
+          </button>
         </div>
       </div>
     `;
@@ -653,15 +686,16 @@ class AppController {
 
     workspace.innerHTML = `
       <div class="dashboard-workspace">
-        <div class="scenario-box" style="margin-bottom:12px; font-size:0.95rem;">
-          <strong>Interactive Controls</strong>: Configure the app server panel. Discuss settings with the audience and toggle switches. Click verify configuration when aligned.
+        <div class="scenario-context-block" style="margin-bottom:14px;">
+          <div class="scenario-context-label">SECURITY AUDIT CHALLENGE</div>
+          <div class="scenario-context-text">A security auditor has flagged your PaaS web application as vulnerable. Review each control below and toggle them to their correct security state to pass the audit.</div>
         </div>
 
         <div class="server-card">
           <div class="server-header">
             <div class="server-title">
               <svg style="width:20px; height:20px; fill:#0056b3" viewBox="0 0 24 24"><path d="M12,16A3,3 0 0,1 9,13C9,11.88 9.77,10.94 10.8,10.68L8.6,3H10L12,10L14,3H15.4L13.2,10.68C14.23,10.94 15,11.88 15,13A3,3 0 0,1 12,16M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"/></svg>
-              PaaS Config dashboard card
+              App Security Configuration Review
             </div>
             <div class="server-status-pill ${isAllCorrect ? 'secure' : 'vulnerable'}" id="threat-indicator">
               ${isAllCorrect ? 'Secure Posture' : 'Vulnerable Posture'}
@@ -723,8 +757,9 @@ class AppController {
 
     workspace.innerHTML = `
       <div class="sorting-workspace">
-        <div class="scenario-box" style="margin-bottom:12px; font-size:0.95rem;">
-          <strong>Sequential Ordering</strong>: ${this.activeGame.description || 'Arrange the steps in the correct chronological order.'}
+        <div class="sorting-instruction-bar">
+          <span class="sorting-instruction-icon">↕</span>
+          <span>Drag or use <strong>▲ ▼</strong> arrows to arrange steps in the correct chronological order</span>
         </div>
 
         <div class="sorting-list" id="sorting-list-container"></div>
@@ -786,16 +821,30 @@ class AppController {
     const decision = this.activeGame.decisions[this.currentDecisionIndex];
     const isCorrect = this.selectedOptionIndex === decision.correctIndex;
     
-    // Set feedback variables
     this.isCurrentStepResolved = true;
     this.isCurrentStepCorrect = isCorrect;
-    this.renderLeftDiagram(); // Re-render diagram to show state transition
+    this.renderLeftDiagram();
+
+    // Visual feedback on option buttons
+    const options = document.querySelectorAll('#options-list .option-btn-new');
+    options.forEach((btn, idx) => {
+      btn.style.pointerEvents = 'none';
+      const letter = btn.querySelector('.option-letter');
+      if (idx === decision.correctIndex) {
+        btn.style.borderColor = '#2ecc71';
+        btn.style.background = 'rgba(46,204,113,0.06)';
+        if (letter) { letter.style.background='#2ecc71'; letter.style.borderColor='#2ecc71'; letter.style.color='#fff'; }
+      } else if (idx === this.selectedOptionIndex && !isCorrect) {
+        btn.style.borderColor = '#e74c3c';
+        btn.style.background = 'rgba(231,76,60,0.05)';
+        if (letter) { letter.style.background='#e74c3c'; letter.style.borderColor='#e74c3c'; letter.style.color='#fff'; }
+      }
+    });
 
     this.answersLog.push(isCorrect);
     if (isCorrect) {
       this.score++;
       this.updateHUD();
-
       document.getElementById('correct-feedback').style.display = 'block';
       document.getElementById('correct-explanation').textContent = decision.revealCause;
     } else {
@@ -806,7 +855,7 @@ class AppController {
 
     const nextBtn = document.getElementById('btn-next');
     nextBtn.style.display = 'flex';
-    nextBtn.textContent = this.currentDecisionIndex < 4 ? "Next Scenario" : "View Results";
+    nextBtn.textContent = this.currentDecisionIndex < 4 ? 'Next Scenario' : 'View Results';
   }
 
   verifyDragDrop() {
@@ -1875,29 +1924,29 @@ class AppController {
     const resolved = this.isCurrentStepResolved;
     const correct = this.isCurrentStepCorrect;
 
-    let statusText = "Device Compliant";
-    let statusClass = "glow-success";
-    let textStyle = "#2ecc71";
+    const statusText = resolved && correct ? 'ACCESS GRANTED: Compliant Device' : (resolved && !correct ? 'ACCESS BLOCKED: Evaluation Failed' : 'Conditional Access Evaluation...');
+    const statusColor = resolved && correct ? '#2ecc71' : (resolved && !correct ? '#e74c3c' : '#0056b3');
+    const statusClass = resolved && correct ? 'glow-success' : (resolved && !correct ? 'glow-danger' : '');
 
-    if (resolved && !correct) {
-      statusText = "Device Blocked: Non-Compliant";
-      statusClass = "glow-danger";
-      textStyle = "#e74c3c";
-    }
+    const items = [
+      { label: 'Endpoint Firewall', icon: resolved ? '\u2714' : '?', color: resolved ? '#2ecc71' : '#7d93a8' },
+      { label: 'OS Patch Level', icon: resolved && !correct ? '\u2718' : (resolved ? '\u2714' : '?'), color: resolved && !correct ? '#e74c3c' : (resolved ? '#2ecc71' : '#7d93a8') },
+      { label: 'Disk Encryption', icon: resolved ? '\u2714' : '?', color: resolved ? '#2ecc71' : '#7d93a8' },
+    ];
+
+    const rows = items.map((item, i) => `
+      <rect x="90" y="${155 + i*65}" width="320" height="50" rx="6" fill="#f8fafc" stroke="${item.color === '#7d93a8' ? '#e2e8f0' : item.color + '44'}" stroke-width="1.5"/>
+      <text x="115" y="${183 + i*65}" font-family="sans-serif" font-size="13" fill="${item.color}" font-weight="bold">${item.icon}</text>
+      <text x="140" y="${183 + i*65}" font-family="sans-serif" font-size="12" fill="#334155" font-weight="600">${item.label}</text>
+      <text x="390" y="${183 + i*65}" font-family="sans-serif" font-size="11" fill="${item.color}" font-weight="bold" text-anchor="middle">${item.color === '#7d93a8' ? 'CHECKING...' : (item.icon === '\u2714' ? 'PASS' : 'FAIL')}</text>
+    `).join('');
 
     return this.wrapSVG(`
-      <rect x="80" y="100" width="340" height="280" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
-      <rect x="80" y="100" width="340" height="50" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
-      <text x="110" y="130" font-family="sans-serif" font-size="14" fill="#0a1c2a" font-weight="bold">Compliance Attestation Scan</text>
-
-      <text x="110" y="195" font-family="sans-serif" font-size="13" fill="#2ecc71">✔ Endpoint Firewalls: ON</text>
-      <text x="110" y="235" font-family="sans-serif" font-size="13" fill="${resolved && !correct ? '#e74c3c' : '#2ecc71'}">
-        ${resolved && !correct ? '✘ OS Update: Outdated' : '✔ Operating System: Patched'}
-      </text>
-      <text x="110" y="275" font-family="sans-serif" font-size="13" fill="#2ecc71">✔ BitLocker Encryption: ACTIVE</text>
-      
-      <rect x="100" y="310" width="300" height="40" rx="6" fill="${textStyle}" opacity="0.1" class="${statusClass}"/>
-      <text x="250" y="334" font-family="sans-serif" font-size="12" fill="${textStyle}" font-weight="bold" text-anchor="middle">${statusText}</text>
+      <rect x="80" y="80" width="340" height="55" rx="10" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+      <text x="250" y="113" font-family="sans-serif" font-size="14" fill="#0a1c2a" font-weight="bold" text-anchor="middle">Device Compliance Check</text>
+      ${rows}
+      <rect x="90" y="360" width="320" height="45" rx="8" fill="rgba(0,86,179,0.04)" stroke="${statusColor}" stroke-width="1.5" class="${statusClass}"/>
+      <text x="250" y="388" font-family="sans-serif" font-size="11" fill="${statusColor}" font-weight="bold" text-anchor="middle">${statusText}</text>
     `);
   }
 
@@ -2058,62 +2107,50 @@ class AppController {
   }
 
   drawPaaSDashboard() {
-    const httpsSecured = this.toggleStates['toggle_https'] === true;
-    const corsSecured = this.toggleStates['toggle_cors'] === true;
-    const secretsSecured = this.toggleStates['toggle_secrets'] === true;
-    const basicAuthDisabled = this.toggleStates['toggle_basicauth'] === true;
-    const rateLimitEnabled = this.toggleStates['toggle_ratelimit'] === true;
+    const resolved = this.isCurrentStepResolved;
+    const correct = this.isCurrentStepCorrect;
+    const allOn = ['toggle_https','toggle_cors','toggle_secrets','toggle_basicauth','toggle_ratelimit'].every(k => this.toggleStates[k] === true);
+
+    const borderColor = resolved ? (correct ? '#2ecc71' : '#e74c3c') : (allOn ? '#2ecc71' : '#0056b3');
+    const statusText = resolved ? (correct ? 'CONFIGURATION VERIFIED SECURE' : 'CONFIGURATION REJECTED') : (allOn ? 'ALL CONTROLS ENABLED' : 'Configure Security Controls');
+    const statusColor = resolved ? (correct ? '#2ecc71' : '#e74c3c') : (allOn ? '#2ecc71' : '#0056b3');
 
     return this.wrapSVG(`
-      <!-- Dashboard header -->
-      <rect x="30" y="30" width="440" height="440" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
-      <rect x="30" y="30" width="440" height="60" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
-      <text x="250" y="68" font-family="sans-serif" font-size="15" fill="#0a1c2a" font-weight="bold" text-anchor="middle">PaaS Security Dashboard Console</text>
+      <!-- PaaS App Server Architecture -->
+      <rect x="30" y="30" width="440" height="440" rx="12" fill="#ffffff" stroke="${borderColor}" stroke-width="2"/>
+      <rect x="30" y="30" width="440" height="55" rx="12" fill="#f8fafc" stroke="${borderColor}" stroke-width="2"/>
+      <text x="250" y="63" font-family="sans-serif" font-size="14" fill="#0a1c2a" font-weight="bold" text-anchor="middle">PaaS Application Server</text>
 
-      <!-- Row 1: HTTPS -->
-      <rect x="50" y="110" width="400" height="55" rx="6" fill="#f8fafc" stroke="${httpsSecured ? '#2ecc71' : '#e74c3c'}" stroke-width="1.5"/>
-      <text x="70" y="142" font-family="sans-serif" font-size="12" fill="#0a1c2a" font-weight="bold">HTTPS Redirection</text>
-      <text x="280" y="142" font-family="sans-serif" font-size="14" fill="#0a1c2a" text-anchor="middle">${httpsSecured ? '🔒' : '🔓'}</text>
-      <circle cx="340" cy="138" r="8" fill="${httpsSecured ? '#2ecc71' : '#e74c3c'}"/>
-      <text x="360" y="142" font-family="sans-serif" font-size="11" fill="${httpsSecured ? '#2ecc71' : '#e74c3c'}" font-weight="bold">
-        ${httpsSecured ? 'TLS SECURE' : 'HTTP CLEAR'}
-      </text>
+      <!-- Internet / Client -->
+      <rect x="175" y="105" width="150" height="45" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+      <text x="250" y="133" font-family="sans-serif" font-size="12" fill="#485c70" font-weight="bold" text-anchor="middle">Client Browser</text>
 
-      <!-- Row 2: CORS -->
-      <rect x="50" y="180" width="400" height="55" rx="6" fill="#f8fafc" stroke="${corsSecured ? '#2ecc71' : '#e74c3c'}" stroke-width="1.5"/>
-      <text x="70" y="212" font-family="sans-serif" font-size="12" fill="#0a1c2a" font-weight="bold">CORS Policy Scope</text>
-      <text x="280" y="212" font-family="sans-serif" font-size="14" fill="#0a1c2a" text-anchor="middle">${corsSecured ? '✔' : '✖'}</text>
-      <circle cx="340" cy="208" r="8" fill="${corsSecured ? '#2ecc71' : '#e74c3c'}"/>
-      <text x="360" y="212" font-family="sans-serif" font-size="11" fill="${corsSecured ? '#2ecc71' : '#e74c3c'}" font-weight="bold">
-        ${corsSecured ? 'RESTRICTED' : 'ANY ORIGIN (*)'}
-      </text>
+      <!-- Arrow down -->
+      <line x1="250" y1="150" x2="250" y2="185" stroke="#cbd5e1" stroke-width="2"/>
+      <polygon points="250,192 244,180 256,180" fill="#cbd5e1"/>
 
-      <!-- Row 3: Key Vault -->
-      <rect x="50" y="250" width="400" height="55" rx="6" fill="#f8fafc" stroke="${secretsSecured ? '#2ecc71' : '#e74c3c'}" stroke-width="1.5"/>
-      <text x="70" y="282" font-family="sans-serif" font-size="12" fill="#0a1c2a" font-weight="bold">Database Secrets</text>
-      <text x="280" y="282" font-family="sans-serif" font-size="14" fill="#0a1c2a" text-anchor="middle">${secretsSecured ? '🔑' : '⚠'}</text>
-      <circle cx="340" cy="278" r="8" fill="${secretsSecured ? '#2ecc71' : '#e74c3c'}"/>
-      <text x="360" y="282" font-family="sans-serif" font-size="11" fill="${secretsSecured ? '#2ecc71' : '#e74c3c'}" font-weight="bold">
-        ${secretsSecured ? 'KEY VAULT' : 'PLAIN CODE'}
-      </text>
+      <!-- App Layer -->
+      <rect x="100" y="195" width="300" height="60" rx="8" fill="#ffffff" stroke="#0056b3" stroke-width="2"/>
+      <text x="250" y="225" font-family="sans-serif" font-size="13" fill="#0056b3" font-weight="bold" text-anchor="middle">Web Application Layer</text>
+      <text x="250" y="242" font-family="sans-serif" font-size="10" fill="#7d93a8" text-anchor="middle">Auth &#x2022; API Rate Control &#x2022; CORS &#x2022; TLS</text>
 
-      <!-- Row 4: Basic Auth -->
-      <rect x="50" y="320" width="400" height="55" rx="6" fill="#f8fafc" stroke="${basicAuthDisabled ? '#2ecc71' : '#e74c3c'}" stroke-width="1.5"/>
-      <text x="70" y="352" font-family="sans-serif" font-size="12" fill="#0a1c2a" font-weight="bold">Basic Authentication</text>
-      <text x="280" y="352" font-family="sans-serif" font-size="14" fill="#0a1c2a" text-anchor="middle">${basicAuthDisabled ? '🛡' : '👤'}</text>
-      <circle cx="340" cy="348" r="8" fill="${basicAuthDisabled ? '#2ecc71' : '#e74c3c'}"/>
-      <text x="360" y="352" font-family="sans-serif" font-size="11" fill="${basicAuthDisabled ? '#2ecc71' : '#e74c3c'}" font-weight="bold">
-        ${basicAuthDisabled ? 'DISABLED (OAuth2)' : 'ENABLED (Basic)'}
-      </text>
+      <!-- Arrow down -->
+      <line x1="250" y1="255" x2="250" y2="285" stroke="#cbd5e1" stroke-width="2"/>
+      <polygon points="250,292 244,280 256,280" fill="#cbd5e1"/>
 
-      <!-- Row 5: Rate Limiting -->
-      <rect x="50" y="390" width="400" height="55" rx="6" fill="#f8fafc" stroke="${rateLimitEnabled ? '#2ecc71' : '#e74c3c'}" stroke-width="1.5"/>
-      <text x="70" y="422" font-family="sans-serif" font-size="12" fill="#0a1c2a" font-weight="bold">API Rate Limiting</text>
-      <text x="280" y="422" font-family="sans-serif" font-size="14" fill="#0a1c2a" text-anchor="middle">${rateLimitEnabled ? '⏳' : '⚡'}</text>
-      <circle cx="340" cy="418" r="8" fill="${rateLimitEnabled ? '#2ecc71' : '#e74c3c'}"/>
-      <text x="360" y="422" font-family="sans-serif" font-size="11" fill="${rateLimitEnabled ? '#2ecc71' : '#e74c3c'}" font-weight="bold">
-        ${rateLimitEnabled ? 'LIMIT ACTIVE' : 'NO LIMIT (DDoS)'}
-      </text>
+      <!-- Secrets / Key Vault -->
+      <rect x="340" y="300" width="110" height="50" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+      <text x="395" y="330" font-family="sans-serif" font-size="11" fill="#485c70" font-weight="bold" text-anchor="middle">Secrets Store</text>
+      <line x1="340" y1="325" x2="320" y2="325" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4,3"/>
+
+      <!-- Database Layer -->
+      <rect x="100" y="295" width="210" height="60" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+      <text x="205" y="325" font-family="sans-serif" font-size="13" fill="#0a1c2a" font-weight="bold" text-anchor="middle">Database Layer</text>
+      <text x="205" y="342" font-family="sans-serif" font-size="10" fill="#7d93a8" text-anchor="middle">Credentials &#x2022; Encryption &#x2022; Access</text>
+
+      <!-- Status banner -->
+      <rect x="80" y="390" width="340" height="50" rx="8" fill="rgba(0,86,179,0.04)" stroke="${statusColor}" stroke-width="1.5" class="${resolved && correct ? 'glow-success' : (resolved && !correct ? 'glow-danger' : '')}"/>
+      <text x="250" y="420" font-family="sans-serif" font-size="12" fill="${statusColor}" font-weight="bold" text-anchor="middle">${statusText}</text>
     `);
   }
 
@@ -2355,45 +2392,36 @@ class AppController {
     const resolved = this.isCurrentStepResolved;
     const correct = this.isCurrentStepCorrect;
 
-    let subnetBorder = resolved && correct ? '#2ecc71' : (resolved && !correct ? '#e74c3c' : '#cbd5e1');
-    let subnetFill = resolved && correct ? 'rgba(46, 204, 113, 0.03)' : (resolved && !correct ? 'rgba(231, 76, 60, 0.03)' : 'rgba(203, 213, 225, 0.1)');
+    const subnetALabel = resolved ? 'Public Subnet (10.0.1.0/24)' : 'Subnet A';
+    const subnetBLabel = resolved ? 'Private Subnet (10.0.2.0/24)' : 'Subnet B';
+    const nodeALabel = resolved ? 'Web Server' : 'App Node';
+    const nodeBLabel = resolved ? 'Database' : 'Data Node';
+    const subnetAColor = resolved && correct ? '#2ecc71' : (resolved && !correct ? '#e74c3c' : '#00b5e2');
+    const subnetBColor = resolved && correct ? '#2ecc71' : (resolved && !correct ? '#e74c3c' : '#cbd5e1');
+    const statusText = resolved && correct ? 'NETWORK ISOLATION CORRECT' : (resolved && !correct ? 'SUBNET DESIGN INCORRECT' : 'Evaluate Subnet Architecture');
+    const statusColor = resolved && correct ? '#2ecc71' : (resolved && !correct ? '#e74c3c' : '#0056b3');
 
     return this.wrapSVG(`
       <rect x="30" y="50" width="440" height="400" rx="10" fill="#ffffff" stroke="#0056b3" stroke-width="2"/>
-      <text x="50" y="75" font-family="sans-serif" font-size="14" fill="#0056b3" font-weight="bold">Cloud VPC (10.0.0.0/16)</text>
+      <text x="50" y="78" font-family="sans-serif" font-size="14" fill="#0056b3" font-weight="bold">Cloud VPC Network Design</text>
 
-      <!-- Public Subnet -->
-      <rect x="50" y="100" width="390" height="120" rx="8" fill="rgba(0, 181, 226, 0.03)" stroke="#00b5e2" stroke-width="1.5" stroke-dasharray="4,4"/>
-      <text x="70" y="122" font-family="sans-serif" font-size="12" fill="#00b5e2" font-weight="bold">Public Subnet (10.0.1.0/24)</text>
-      
-      <!-- Web VM -->
-      <rect x="70" y="145" width="100" height="55" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
-      <text x="120" y="178" font-family="sans-serif" font-size="12" fill="#0a1c2a" font-weight="bold" text-anchor="middle">Web Server</text>
+      <!-- Subnet A -->
+      <rect x="50" y="100" width="390" height="120" rx="8" fill="rgba(0,181,226,0.03)" stroke="${subnetAColor}" stroke-width="1.5" stroke-dasharray="4,4"/>
+      <text x="70" y="122" font-family="sans-serif" font-size="12" fill="${subnetAColor}" font-weight="bold">${subnetALabel}</text>
+      <rect x="70" y="138" width="100" height="55" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+      <text x="120" y="170" font-family="sans-serif" font-size="12" fill="#0a1c2a" font-weight="bold" text-anchor="middle">${nodeALabel}</text>
+      ${resolved ? `<rect x="200" y="138" width="110" height="55" rx="6" fill="#f8fafc" stroke="${subnetAColor}" stroke-width="1.5"/><text x="255" y="170" font-family="sans-serif" font-size="11" fill="${subnetAColor}" font-weight="bold" text-anchor="middle">Internet GW</text>` : `<rect x="200" y="148" width="100" height="35" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="4,3"/><text x="250" y="170" font-family="sans-serif" font-size="11" fill="#7d93a8" text-anchor="middle">Internet Access?</text>`}
 
-      <!-- Internet Gateway -->
-      <rect x="310" y="145" width="110" height="55" rx="6" fill="#f8fafc" stroke="#00b5e2" stroke-width="1.5"/>
-      <text x="365" y="178" font-family="sans-serif" font-size="11" fill="#00b5e2" font-weight="bold" text-anchor="middle">Internet Gateway</text>
-      <line x1="170" y1="173" x2="310" y2="173" stroke="#00b5e2" stroke-width="2" stroke-dasharray="5,3" class="animate-dash-slow"/>
+      <!-- Subnet B -->
+      <rect x="50" y="240" width="390" height="130" rx="8" fill="rgba(203,213,225,0.05)" stroke="${subnetBColor}" stroke-width="2"/>
+      <text x="70" y="262" font-family="sans-serif" font-size="12" fill="${subnetBColor}" font-weight="bold">${subnetBLabel}</text>
+      <rect x="70" y="278" width="100" height="55" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+      <text x="120" y="310" font-family="sans-serif" font-size="12" fill="#0a1c2a" font-weight="bold" text-anchor="middle">${nodeBLabel}</text>
+      ${resolved && correct ? `<rect x="200" y="278" width="215" height="55" rx="6" fill="rgba(46,204,113,0.06)" stroke="#2ecc71" stroke-width="1.5" class="glow-success"/><text x="307" y="305" font-family="sans-serif" font-size="11" fill="#2ecc71" font-weight="bold" text-anchor="middle">ISOLATED: No Internet Route</text>` : (resolved && !correct ? `<rect x="200" y="278" width="215" height="55" rx="6" fill="rgba(231,76,60,0.06)" stroke="#e74c3c" stroke-width="1.5" class="glow-danger"/><text x="307" y="305" font-family="sans-serif" font-size="11" fill="#e74c3c" font-weight="bold" text-anchor="middle">EXPOSED: Internet Route Active</text>` : `<rect x="200" y="288" width="215" height="35" rx="6" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="4,3"/><text x="307" y="310" font-family="sans-serif" font-size="11" fill="#7d93a8" text-anchor="middle">Should this subnet be isolated?</text>`)}
 
-      <!-- Private Subnet -->
-      <rect x="50" y="240" width="390" height="130" rx="8" fill="${subnetFill}" stroke="${subnetBorder}" stroke-width="2"/>
-      <text x="70" y="262" font-family="sans-serif" font-size="12" fill="${resolved && correct ? '#2ecc71' : (resolved && !correct ? '#e74c3c' : '#485c70')}" font-weight="bold">Private Subnet (10.0.2.0/24)</text>
-
-      <!-- Database VM -->
-      <rect x="70" y="290" width="100" height="55" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
-      <text x="120" y="323" font-family="sans-serif" font-size="12" fill="#0a1c2a" font-weight="bold" text-anchor="middle">Database DB</text>
-
-      <!-- Routing status -->
-      ${resolved && correct ? `
-        <rect x="190" y="290" width="230" height="55" rx="6" fill="rgba(46, 204, 113, 0.08)" stroke="#2ecc71" stroke-width="1.5" class="glow-success"/>
-        <text x="305" y="315" font-family="sans-serif" font-size="11" fill="#2ecc71" font-weight="bold" text-anchor="middle">ISOLATION SECURED</text>
-        <text x="305" y="332" font-family="sans-serif" font-size="10" fill="#485c70" text-anchor="middle">No route to Internet Gateway</text>
-      ` : `
-        <rect x="190" y="290" width="230" height="55" rx="6" fill="${resolved && !correct ? 'rgba(231, 76, 60, 0.08)' : '#f8fafc'}" stroke="${resolved && !correct ? '#e74c3c' : '#cbd5e1'}" stroke-width="1.5" stroke-dasharray="${resolved && !correct ? 'none' : '4,4'}"/>
-        <text x="305" y="323" font-family="sans-serif" font-size="11" fill="${resolved && !correct ? '#e74c3c' : '#7d93a8'}" font-weight="bold" text-anchor="middle">
-          ${resolved && !correct ? 'RISK: DIRECT INTERNET IG' : 'Audit Private Subnet Separation'}
-        </text>
-      `}
+      <!-- Status -->
+      <rect x="80" y="395" width="340" height="40" rx="8" fill="rgba(0,86,179,0.04)" stroke="${statusColor}" stroke-width="1.5"/>
+      <text x="250" y="420" font-family="sans-serif" font-size="12" fill="${statusColor}" font-weight="bold" text-anchor="middle">${statusText}</text>
     `);
   }
 

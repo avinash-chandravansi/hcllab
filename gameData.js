@@ -87,7 +87,7 @@ const gameData = {
           id: "m1_g2",
           title: "PaaS Configuration Dashboard",
           subtitle: "Interactive Server Configuration Card",
-          description: "Discuss and configure the security settings of a Platform as a Service (PaaS) web application. Set parameters to transition the security posture from Vulnerable to Secure.",
+          description: "Your team has deployed a PaaS web application and the security auditor has flagged it as vulnerable. The app currently has no HTTPS enforcement, wildcard CORS headers, hardcoded database credentials, legacy Basic Auth enabled, and no API rate limiting. Configure each security control correctly to pass the audit.",
           type: "toggle_dashboard",
           items: [
             {
@@ -538,8 +538,8 @@ const gameData = {
             {
               id: "m2_g4_d3",
               category: "identity",
-              scenario: "A user attempts to log in from a personal device in a new country. Even though they entered the correct password and completed MFA, the system blocks access because the device lacks corporate patch compliance.",
-              question: "What Zero Trust evaluation criteria determines access in this scenario?",
+              scenario: "A remote contractor successfully enters the correct username, password, and one-time MFA code from a personal laptop. Despite valid credentials, the Zero Trust policy engine denies the session before granting resource access.",
+              question: "Which Zero Trust evaluation signal is most likely causing the access denial despite valid credentials and MFA?",
               options: [
                 "Static Verification Tokens - Verifying credentials against static security challenge questions and caching domain cookies.",
                 "Explicit Verification of device state, compliance, location, and risk context.",
@@ -668,8 +668,8 @@ const gameData = {
             {
               id: "m3_g1_d1",
               category: "network",
-              scenario: "Designing a multi-tier web application network. Web servers need public access, but databases must be completely private.",
-              question: "What is the optimal subnet architecture to secure the application database tier?",
+              scenario: "A DevOps engineer is designing a multi-tier web application network. The web tier serves external users and the data tier holds the customer records. The team debates how to segment and route traffic between the two tiers.",
+              question: "What network segmentation strategy should be applied to isolate the database tier from direct external access?",
               options: [
                 "Public-Private Subnet Split - Deploy databases in a private subnet with no public route, using virtual network boundary rules to restrict ingress to the web tier.",
                 "Direct Internet Gateways - Place both tiers in a public subnet and use database firewall rules to block inbound TCP port 1433 requests.",
@@ -813,10 +813,10 @@ const gameData = {
             {
               id: "toggle_geoblock",
               name: "Geographic IP Restrictions",
-              desc: "Filter web access based on country-of-origin headers to restrict high-risk locations.",
+              desc: "Filter web access based on country-of-origin headers. Note: Your SaaS product has global customers in all regions.",
               defaultState: false,
-              correctState: true,
-              revealCause: "Geoblocking blocks connections from regions where the enterprise has no operational or customer presence, reducing scan exposures."
+              correctState: false,
+              revealCause: "Geo-blocking should NOT be enabled here — your SaaS product serves global customers. Enabling it would block legitimate users from valid regions. Only apply geo-blocking when your service has known regional restrictions."
             },
             {
               id: "toggle_botcontrol",

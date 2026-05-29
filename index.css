@@ -1432,3 +1432,276 @@ input:checked + .slider:before {
 }
 
 
+
+/* ==================== REDESIGNED SCENARIO MCQ QUESTION UI ==================== */
+
+.scenario-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.scenario-header-row {
+  display: flex;
+  align-items: center;
+}
+
+.scenario-step-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, rgba(0,86,179,0.08) 0%, rgba(0,181,226,0.08) 100%);
+  border: 1px solid rgba(0,86,179,0.18);
+  color: #0056b3;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 5px 14px;
+  border-radius: 50px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.scenario-of-five {
+  font-weight: 500;
+  opacity: 0.65;
+}
+
+.scenario-context-block {
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #0056b3;
+  padding: 16px 18px;
+}
+
+.scenario-context-label {
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  color: #0056b3;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  opacity: 0.7;
+}
+
+.scenario-context-text {
+  font-size: 0.95rem;
+  color: #334155;
+  line-height: 1.6;
+}
+
+.question-block {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0 6px 0;
+  border-top: 1px solid #f1f5f9;
+}
+
+.question-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  background: #0056b3;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 900;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  box-shadow: 0 2px 8px rgba(0,86,179,0.25);
+}
+
+.question-text-new {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.options-list-new {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 14px;
+}
+
+.option-btn-new {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  width: 100%;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 15px;
+  text-align: left;
+  color: #1e293b;
+  font-size: 0.91rem;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  outline: none;
+  line-height: 1.5;
+}
+
+.option-btn-new:hover {
+  border-color: rgba(0, 86, 179, 0.35);
+  background: rgba(0, 86, 179, 0.025);
+  transform: translateX(2px);
+  box-shadow: 0 2px 10px rgba(0,86,179,0.06);
+}
+
+.option-letter {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  border: 1.5px solid #cbd5e1;
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.16s ease;
+  margin-top: 1px;
+}
+
+.option-text-content {
+  flex: 1;
+  line-height: 1.5;
+}
+
+.option-btn-new.selected {
+  background: rgba(0, 86, 179, 0.05);
+  border-color: #0056b3;
+  border-width: 2px;
+  box-shadow: 0 0 0 3px rgba(0,86,179,0.07), 0 3px 12px rgba(0,86,179,0.08);
+  transform: translateX(3px);
+}
+
+.option-btn-new.selected .option-text-content {
+  color: #0056b3;
+  font-weight: 600;
+}
+
+.option-letter.selected-letter {
+  background: #0056b3;
+  border-color: #0056b3;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,86,179,0.3);
+}
+
+/* ==================== INSTRUCTION BARS ==================== */
+
+.drag-instruction-bar,
+.sorting-instruction-bar,
+.swiper-instructions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 86, 179, 0.03);
+  border: 1px solid rgba(0, 86, 179, 0.1);
+  border-radius: 8px;
+  padding: 10px 15px;
+  font-size: 0.87rem;
+  color: #485c70;
+  margin-bottom: 6px;
+}
+
+.drag-instruction-icon,
+.sorting-instruction-icon {
+  font-size: 1.1rem;
+  color: #0056b3;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.swiper-instructions {
+  width: 100%;
+  max-width: 400px;
+}
+
+.swiper-instructions svg {
+  flex-shrink: 0;
+  color: #0056b3;
+}
+
+/* ==================== RESULTS VIEW OVERLAY FIX ==================== */
+
+#results-view {
+  position: fixed !important;
+  top: 80px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
+  background: rgba(243, 246, 249, 0.96);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  flex: unset;
+  padding: 40px 24px;
+}
+
+.results-panel {
+  max-width: 520px;
+  width: 100%;
+  padding: 44px;
+  text-align: center;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 20px 60px rgba(0,86,179,0.08), 0 4px 20px rgba(0,0,0,0.04);
+  animation: resultsSlideIn 0.35s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+}
+
+@keyframes resultsSlideIn {
+  from { opacity: 0; transform: translateY(18px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Feedback animation */
+@keyframes feedbackFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.feedback-box {
+  animation: feedbackFadeIn 0.28s ease forwards;
+}
+
+/* Sorting number solid blue */
+.sorting-number {
+  color: #ffffff;
+  background: #0056b3;
+  box-shadow: 0 2px 6px rgba(0, 86, 179, 0.2);
+}
+
+
+/* ==================== RESET ALL PROGRESS BUTTON ==================== */
+.btn-reset-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  background: transparent;
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  color: #c0392b;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 7px 18px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  letter-spacing: 0.3px;
+}
+
+.btn-reset-all:hover {
+  background: rgba(231, 76, 60, 0.06);
+  border-color: rgba(231, 76, 60, 0.5);
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.12);
+}
