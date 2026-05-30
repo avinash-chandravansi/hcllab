@@ -385,7 +385,11 @@ class AppController {
     decision.options.forEach((opt, idx) => {
       const optBtn = document.createElement('button');
       optBtn.className = 'option-btn';
-      optBtn.innerHTML = opt;
+      optBtn.innerHTML = `<span style="font-weight:800; color:#0056b3; min-width:24px; display:inline-block; flex-shrink:0;">${idx + 1}.</span> ${opt}`;
+      optBtn.style.display = 'flex';
+      optBtn.style.alignItems = 'flex-start';
+      optBtn.style.gap = '6px';
+      optBtn.style.textAlign = 'left';
       optBtn.addEventListener('click', () => this.selectOption(idx));
       optionsContainer.appendChild(optBtn);
     });

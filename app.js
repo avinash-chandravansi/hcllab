@@ -382,7 +382,7 @@ class AppController {
       }
     });
 
-    const labels = ['A', 'B', 'C', 'D', 'E'];
+    const labels = ['1', '2', '3', '4', '5'];
 
     workspace.innerHTML = `
       <div class="scenario-workspace">
